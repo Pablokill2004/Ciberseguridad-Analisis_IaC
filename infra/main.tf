@@ -51,20 +51,22 @@ resource "aws_security_group" "app" {
 }
 
 # --- Computo -------------------------------------------------------------
-# Instancia con IMDSv1 permitido, disco sin cifrar y sin monitoreo detallado.
+# IMDSv2 obligatorio, disco cifrado, monitoreo detallado y EBS optimizado.
 resource "aws_instance" "app" {
-  ami                         = "ami-0c55b159cbfafe1f0"
-  instance_type               = "t3.micro"
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t3.micro"
+  monitoring    = true
+  ebs_optimized = true
+
   associate_public_ip_address = true
-  monitoring                  = false
 
   metadata_options {
     http_endpoint = "enabled"
-    http_tokens   = "optional"
+    http_tokens   = "required"
   }
 
   root_block_device {
-    encrypted = false
+    encrypted = true
   }
 }
 
