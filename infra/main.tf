@@ -58,6 +58,9 @@ resource "aws_instance" "app" {
   monitoring    = true
   ebs_optimized = true
 
+  iam_instance_profile   = aws_iam_instance_profile.app.name
+  vpc_security_group_ids = [aws_security_group.app.id]
+
   associate_public_ip_address = true
 
   metadata_options {
@@ -71,6 +74,29 @@ resource "aws_instance" "app" {
 }
 
 # --- Identidad ------------------------------------------------------------
+# Rol e instance profile para que la instancia use credenciales temporales.
+resource "aws_iam_role" "app" {
+  name = "app-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_instance_profile" "app" {
+  name = "app-profile"
+  role = aws_iam_role.app.name
+}
+
 # Permisos acotados a un bucket concreto.
 resource "aws_iam_policy" "app" {
   name        = "app-lectura-configuracion"
