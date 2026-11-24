@@ -120,14 +120,14 @@ resource "aws_iam_policy" "app" {
   })
 }
 
-# Politica de contrasenas debil.
-resource "aws_iam_account_password_policy" "debil" {
-  minimum_password_length        = 6
-  password_reuse_prevention      = 1
-  require_lowercase_characters   = false
-  require_uppercase_characters   = false
-  require_numbers                = false
-  require_symbols                = false
-  max_password_age               = 365
+# Politica de contrasenas robusta.
+resource "aws_iam_account_password_policy" "fuerte" {
+  minimum_password_length        = 14
+  password_reuse_prevention      = 24
+  require_lowercase_characters   = true
+  require_uppercase_characters   = true
+  require_numbers                = true
+  require_symbols                = true
+  max_password_age               = 90
   allow_users_to_change_password = true
 }
