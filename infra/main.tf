@@ -66,6 +66,11 @@ resource "aws_instance" "app" {
   iam_instance_profile   = aws_iam_instance_profile.app.name
   vpc_security_group_ids = [aws_security_group.app.id]
 
+  # La instancia publica un servicio web de laboratorio y necesita IP publica.
+  # Control compensatorio: el Security Group solo expone 80/443 y el SSH queda
+  # limitado a 10.0.0.0/8. Aprobado por el responsable de seguridad
+  # (referencia SEC-2026-014); la excepcion vence el 2026-12-31.
+  #checkov:skip=CKV_AWS_88:IP publica requerida por el servicio de laboratorio; acceso restringido por Security Group; aprobado en SEC-2026-014, vence 2026-12-31.
   associate_public_ip_address = true
 
   metadata_options {
