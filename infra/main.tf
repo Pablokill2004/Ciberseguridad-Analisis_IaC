@@ -25,6 +25,11 @@ resource "aws_security_group" "app" {
   name        = "app-sg"
   description = "Security group de la aplicacion de demostracion"
 
+  tags = {
+    Owner       = "equipo-iac"
+    Environment = "lab"
+  }
+
   ingress {
     description = "SSH desde la red corporativa"
     from_port   = 22
@@ -71,6 +76,11 @@ resource "aws_instance" "app" {
   root_block_device {
     encrypted = true
   }
+
+  tags = {
+    Owner       = "equipo-iac"
+    Environment = "lab"
+  }
 }
 
 # --- Identidad ------------------------------------------------------------
@@ -90,6 +100,11 @@ resource "aws_iam_role" "app" {
       }
     ]
   })
+
+  tags = {
+    Owner       = "equipo-iac"
+    Environment = "lab"
+  }
 }
 
 resource "aws_iam_instance_profile" "app" {
@@ -118,6 +133,11 @@ resource "aws_iam_policy" "app" {
       }
     ]
   })
+
+  tags = {
+    Owner       = "equipo-iac"
+    Environment = "lab"
+  }
 }
 
 # Politica de contrasenas robusta.
