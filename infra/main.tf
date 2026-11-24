@@ -71,18 +71,24 @@ resource "aws_instance" "app" {
 }
 
 # --- Identidad ------------------------------------------------------------
-# Politica IAM con privilegios administrativos totales.
-resource "aws_iam_policy" "admin" {
-  name        = "admin-total"
-  description = "Politica de demostracion con permisos totales"
+# Permisos acotados a un bucket concreto.
+resource "aws_iam_policy" "app" {
+  name        = "app-lectura-configuracion"
+  description = "Lectura acotada del bucket de configuracion"
 
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Effect   = "Allow"
-        Action   = "*"
-        Resource = "*"
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:ListBucket",
+        ]
+        Resource = [
+          "arn:aws:s3:::configuracion-app",
+          "arn:aws:s3:::configuracion-app/*",
+        ]
       }
     ]
   })
