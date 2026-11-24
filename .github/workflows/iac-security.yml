@@ -1,0 +1,61 @@
+name: Seguridad IaC
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  security-events: write # necesario para subir SARIF a Code Scanning
+
+jobs:
+  iac:
+    name: Escaneo IaC
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      # Versiones fijas: el pipeline debe ser reproducible y no romperse por
+      # una actualización silenciosa de las herramientas.
+      - name: Instalar herramientas con versión fija
+        run: pip install checkov==3.4.5 ansible-core==2.21.6 ansible-lint==26.11.0
+
+      # 1) Reporte: NO bloquea, solo genera reportes/results_sarif.sarif
+      # Se escanea una sola vez la raiz para evitar hallazgos duplicados
+      # (checkov repite el escaneo si se pasan varios -d).
+      - name: Checkov - reporte SARIF
+        run: |
+          checkov -d . \
+            --external-checks-dir politicas \
+            --skip-path .venv --skip-path reportes --skip-path docs \
+            --skip-path politicas --skip-path .github \
+            -o sarif --output-file-path reportes --soft-fail
+
+      - name: Publicar en Code Scanning
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: reportes/results_sarif.sarif
+          category: checkov
+
+      # 2) Gates: si fallan, el job falla y el PR no se puede fusionar
+      - name: Gate Checkov
+        run: |
+          checkov -d . \
+            --external-checks-dir politicas \
+            --skip-path .venv --skip-path reportes --skip-path docs \
+            --skip-path politicas --skip-path .github \
+            --compact --quiet
+
+      - name: Validar sintaxis de Ansible
+        run: ansible-playbook -i ansible/inventory.ini ansible/site.yml --syntax-check
+
+      - name: Gate ansible-lint (perfil production)
+        run: ansible-lint --profile production ansible/

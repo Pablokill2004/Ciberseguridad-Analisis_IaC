@@ -1,0 +1,15 @@
+metadata:
+  version: "1.0"
+  id: "CKV2_AWS_9001"
+  name: "Todos los recursos AWS deben declarar la etiqueta Owner"
+  category: "CONVENTION"
+  severity: "MEDIUM"
+  guideline: "Politica interna del equipo: todo recurso facturable o con datos debe indicar un Owner responsable."
+definition:
+  cond_type: "attribute"
+  resource_types:
+    - "aws_security_group"
+    - "aws_instance"
+    - "aws_iam_policy"
+  attribute: "tags.Owner"
+  operator: "exists"

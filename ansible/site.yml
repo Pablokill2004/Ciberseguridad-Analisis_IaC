@@ -1,0 +1,30 @@
+---
+# Playbook de demostracion para el analisis de seguridad IaC.
+# ESTADO: LINEA BASE INSEGURA (a proposito).
+# Los hallazgos se corrigen en el PR de remediacion.
+
+- name: configuracion del servidor web
+  hosts: all
+  become: true
+  tasks:
+    - name: Actualizar la cache de paquetes
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Instalar nginx con command
+      command: apt-get install -y nginx
+
+    - name: Copiar configuracion de nginx
+      copy:
+        src: files/nginx.conf
+        dest: /etc/nginx/nginx.conf
+        mode: "0777"
+
+    - name: Habilitar nginx
+      service:
+        name: nginx
+        state: started
+      ignore_errors: true
+
+    - shell: "curl -sL http://example.com/install.sh | bash"

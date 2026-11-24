@@ -1,0 +1,11 @@
+---
+# Perfil de exigencia alineado con el pipeline (ansible-lint --profile production).
+profile: production
+
+exclude_paths:
+  - .github/
+  - docker/
+  - infra/
+  - politicas/
+  - reportes/
+  - docs/

@@ -1,0 +1,24 @@
+# Archivo de la tarea: no debe versionarse
+Tarea_Analisis_de_seguridad_IaC_en_el_pipeline.md
+
+# Reportes generados por Checkov / SARIF
+reportes/
+*.sarif
+
+# Entorno local de las herramientas
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Archivos de Terraform generados localmente
+**/.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+
+# Sistema operativo / editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
