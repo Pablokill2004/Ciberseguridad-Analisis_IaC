@@ -244,8 +244,8 @@ Ubicación: `infra/main.tf`, recurso `aws_instance.app`.
 Por qué es aceptable: el riesgo residual es **exposición directa a Internet**, no
 un acceso irrestricto; los puertos y rangos están acotados y el resto de los
 controles de la instancia están endurecidos. La excepción es **temporal**,
-auditable (referencia y fecha en el propio código) y **única**: `git grep -n
-"checkov:skip"` devuelve una sola coincidencia.
+auditable (referencia y fecha en el propio código) y **única**:
+`git grep -n "checkov:skip" -- infra/` devuelve una sola coincidencia.
 
 ---
 

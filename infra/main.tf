@@ -25,6 +25,11 @@ resource "aws_security_group" "app" {
   name        = "app-sg"
   description = "Security group de la aplicacion de demostracion"
 
+  tags = {
+    Owner       = "equipo-iac"
+    Environment = "lab"
+  }
+
   ingress {
     description = "SSH desde la red corporativa"
     from_port   = 22
@@ -34,66 +39,120 @@ resource "aws_security_group" "app" {
   }
 
   ingress {
-    description = "HTTP publico"
+    description = "HTTP desde la red corporativa"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["10.0.0.0/8"]
   }
 
   egress {
-    description = "Salida sin restricciones"
+    description = "Salida hacia la red corporativa"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["10.0.0.0/8"]
   }
 }
 
 # --- Computo -------------------------------------------------------------
-# Instancia con IMDSv1 permitido, disco sin cifrar y sin monitoreo detallado.
+# IMDSv2 obligatorio, disco cifrado, monitoreo detallado y EBS optimizado.
 resource "aws_instance" "app" {
-  ami                         = "ami-0c55b159cbfafe1f0"
-  instance_type               = "t3.micro"
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t3.micro"
+  monitoring    = true
+  ebs_optimized = true
+
+  iam_instance_profile   = aws_iam_instance_profile.app.name
+  vpc_security_group_ids = [aws_security_group.app.id]
+
+  # La instancia publica un servicio web de laboratorio y necesita IP publica.
+  # Control compensatorio: el Security Group solo expone 80/443 y el SSH queda
+  # limitado a 10.0.0.0/8. Aprobado por el responsable de seguridad
+  # (referencia SEC-2026-014); la excepcion vence el 2026-12-31.
+  #checkov:skip=CKV_AWS_88:IP publica requerida por el servicio de laboratorio; acceso restringido por Security Group; aprobado en SEC-2026-014, vence 2026-12-31.
   associate_public_ip_address = true
-  monitoring                  = false
 
   metadata_options {
     http_endpoint = "enabled"
-    http_tokens   = "optional"
+    http_tokens   = "required"
   }
 
   root_block_device {
-    encrypted = false
+    encrypted = true
+  }
+
+  tags = {
+    Owner       = "equipo-iac"
+    Environment = "lab"
   }
 }
 
 # --- Identidad ------------------------------------------------------------
-# Politica IAM con privilegios administrativos totales.
-resource "aws_iam_policy" "admin" {
-  name        = "admin-total"
-  description = "Politica de demostracion con permisos totales"
+# Rol e instance profile para que la instancia use credenciales temporales.
+resource "aws_iam_role" "app" {
+  name = "app-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+
+  tags = {
+    Owner       = "equipo-iac"
+    Environment = "lab"
+  }
+}
+
+resource "aws_iam_instance_profile" "app" {
+  name = "app-profile"
+  role = aws_iam_role.app.name
+}
+
+# Permisos acotados a un bucket concreto.
+resource "aws_iam_policy" "app" {
+  name        = "app-lectura-configuracion"
+  description = "Lectura acotada del bucket de configuracion"
 
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Effect   = "Allow"
-        Action   = "*"
-        Resource = "*"
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:ListBucket",
+        ]
+        Resource = [
+          "arn:aws:s3:::configuracion-app",
+          "arn:aws:s3:::configuracion-app/*",
+        ]
       }
     ]
   })
+
+  tags = {
+    Owner       = "equipo-iac"
+    Environment = "lab"
+  }
 }
 
-# Politica de contrasenas debil.
-resource "aws_iam_account_password_policy" "debil" {
-  minimum_password_length        = 6
-  password_reuse_prevention      = 1
-  require_lowercase_characters   = false
-  require_uppercase_characters   = false
-  require_numbers                = false
-  require_symbols                = false
-  max_password_age               = 365
+# Politica de contrasenas robusta.
+resource "aws_iam_account_password_policy" "fuerte" {
+  minimum_password_length        = 14
+  password_reuse_prevention      = 24
+  require_lowercase_characters   = true
+  require_uppercase_characters   = true
+  require_numbers                = true
+  require_symbols                = true
+  max_password_age               = 90
   allow_users_to_change_password = true
 }
