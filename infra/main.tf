@@ -26,11 +26,11 @@ resource "aws_security_group" "app" {
   description = "Security group de la aplicacion de demostracion"
 
   ingress {
-    description = "SSH publico (cambio inseguro para probar el gate)"
+    description = "SSH desde la red corporativa"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["10.0.0.0/8"]
   }
 
   ingress {
