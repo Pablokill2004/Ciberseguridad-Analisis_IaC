@@ -1,8 +1,11 @@
 # Informe: Análisis de seguridad IaC en el pipeline
 
 **Curso:** Ciberseguridad — Análisis de IaC
-**Integrantes:** [RELLENA: nombre integrante 1] y [RELLENA: nombre integrante 2]
+
+**Integrantes:** Pablo Siquinajay y Christian Sosa
+
 **Repositorio:** <https://github.com/Pablokill2004/Ciberseguridad-Analisis_IaC>
+
 **Fecha:** noviembre de 2026
 
 ---
@@ -143,7 +146,7 @@ pushes.
 
 ## 4. Evidencia del gate que bloquea
 
-**PR #1:** [RELLENA: enlace al PR #1]
+**PR #1:** [Enlace al PR que bloquea](https://github.com/Pablokill2004/Ciberseguridad-Analisis_IaC/pull/4)
 **Rama:** `gate/prueba-bloqueo` — cambia el origen del SSH del Security Group de
 `10.0.0.0/8` a `0.0.0.0/0`.
 
@@ -159,10 +162,12 @@ Qué ocurre:
 
 Capturas:
 
-- [RELLENA: captura del PR con el check en rojo y el log del gate]
-- [RELLENA: captura del recuadro de merge bloqueado]
-- [RELLENA: captura del ruleset con `Escaneo IaC` como check obligatorio]
-
+- PR con el check en rojo y el log del gate
+![imagenes/check_en_rojo](imagenes/check_en_rojo.png)
+- Merge bloqueado
+![imagenes/merge_bloqueado](imagenes/merge_bloqueado.png)
+- Ruleset con `Escaneo IaC` como check obligatorio
+![imagenes/Escaneo_IaC_obligatorio](imagenes/Escaneo_IaC_obligatorio.png)
 ---
 
 ## 5. Evidencia SARIF
@@ -171,7 +176,8 @@ El workflow publica `reportes/results_sarif.sarif` en **Security → Code
 scanning** con categoría `checkov`, incluso cuando el job falla (paso con
 `if: always()`).
 
-- [RELLENA: captura de Security → Code scanning con los hallazgos de Checkov]
+- Security → Code scanning con los hallazgos de Checkov
+![Hallazgos_Checkov](imagenes/Hallazgos_Checkov.png)
 
 Si Code Scanning no estuviera disponible (repo privado sin GHAS), el SARIF queda
 como artifact del run (`reportes/`), descargable desde la página del workflow.
@@ -180,7 +186,7 @@ como artifact del run (`reportes/`), descargable desde la página del workflow.
 
 ## 6. Remediación
 
-**PR #2:** [RELLENA: enlace al PR #2]
+**PR #2:** [Enlace al PR de remediación](https://github.com/Pablokill2004/Ciberseguridad-Analisis_IaC/pull/2)
 **Rama:** `remediacion/hallazgos-checkov` — un commit por tipo de corrección.
 
 ### 6.1 Tabla antes/después
@@ -237,7 +243,7 @@ Ubicación: `infra/main.tf`, recurso `aws_instance.app`.
 | Control | `CKV_AWS_88` — la instancia no debe tener IP pública |
 | Justificación | El servicio de laboratorio debe ser alcanzable desde fuera de la VPC; se mantiene una sola IP pública. |
 | Controles compensatorios | Security Group limitado a la red corporativa en SSH y HTTP, IMDSv2 obligatorio, disco cifrado, monitoreo detallado y rol IAM de mínimo privilegio. |
-| Referencia de aprobación | `SEC-2026-014` — [RELLENA: nombre del aprobador, p. ej. responsable de seguridad] |
+| Referencia de aprobación | `SEC-2026-014` — Pablo Siquinajay y Christian Sosa |
 | Vencimiento | `2026-12-31` (se revisa o se retira la excepción antes de esa fecha) |
 | Quién debe aprobarlo | Responsable de seguridad de la información o líder técnico del equipo, nunca el autor del cambio. |
 
