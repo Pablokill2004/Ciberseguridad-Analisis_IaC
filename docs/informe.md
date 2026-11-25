@@ -1,7 +1,7 @@
 # Informe: Análisis de seguridad IaC en el pipeline
 
 **Curso:** Ciberseguridad — Análisis de IaC
-**Integrantes:** [RELLENA: nombre integrante 1] y [RELLENA: nombre integrante 2]
+**Integrantes:** Pablo Siquinajay y Christian Sosa
 **Repositorio:** <https://github.com/Pablokill2004/Ciberseguridad-Analisis_IaC>
 **Fecha:** noviembre de 2026
 
@@ -159,9 +159,14 @@ Qué ocurre:
 
 Capturas:
 
-- [RELLENA: captura del PR con el check en rojo y el log del gate]
-- [RELLENA: captura del recuadro de merge bloqueado]
-- [RELLENA: captura del ruleset con `Escaneo IaC` como check obligatorio]
+- **PR con el check en rojo y el log del gate**
+![PR_Bloqueado](PR_Bloqueado.png)
+- **Recuadro de merge bloqueado**
+
+-  **Ruleset**
+![Ruleset](Ruleset.png)
+- **Rama protegida mediante una verificacion obligatoria en 'Escaneo IaC'**
+![Escaneo IaC](Escaneo_IaC.png)
 
 ---
 
@@ -180,7 +185,7 @@ como artifact del run (`reportes/`), descargable desde la página del workflow.
 
 ## 6. Remediación
 
-**PR #2:** [RELLENA: enlace al PR #2]
+**PR #2:** (https://github.com/Pablokill2004/Ciberseguridad-Analisis_IaC/pull/2)
 **Rama:** `remediacion/hallazgos-checkov` — un commit por tipo de corrección.
 
 ### 6.1 Tabla antes/después
@@ -237,7 +242,7 @@ Ubicación: `infra/main.tf`, recurso `aws_instance.app`.
 | Control | `CKV_AWS_88` — la instancia no debe tener IP pública |
 | Justificación | El servicio de laboratorio debe ser alcanzable desde fuera de la VPC; se mantiene una sola IP pública. |
 | Controles compensatorios | Security Group limitado a la red corporativa en SSH y HTTP, IMDSv2 obligatorio, disco cifrado, monitoreo detallado y rol IAM de mínimo privilegio. |
-| Referencia de aprobación | `SEC-2026-014` — [RELLENA: nombre del aprobador, p. ej. responsable de seguridad] |
+| Referencia de aprobación | `SEC-2026-014` — Pablo Siquinajay |
 | Vencimiento | `2026-12-31` (se revisa o se retira la excepción antes de esa fecha) |
 | Quién debe aprobarlo | Responsable de seguridad de la información o líder técnico del equipo, nunca el autor del cambio. |
 
